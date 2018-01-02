@@ -1,22 +1,24 @@
 package cloud.redis;
 
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("unchecked")
-@Service
+@Component
 public class RedisService {
+	private final Logger logger = Logger.getLogger(getClass());
 
-	@SuppressWarnings("rawtypes")
 	@Autowired
-	RedisTemplate redisTemplate;
+	private StringRedisTemplate redisTemplate;
 	/*@Autowired
 	StringRedisTemplate stringRedisTemplate;*/
 	
@@ -108,7 +110,7 @@ public class RedisService {
 	 * @param value
 	 * @return
 	 */
-	public void set(String key,Object value) {
+	public void set(String key,String value) {
 		redisTemplate.opsForValue().set(key, value);
 		
 	}
@@ -120,7 +122,7 @@ public class RedisService {
 	 * @param date
 	 * @return
 	 */
-	public void set(String key,Object value,Date date) {
+	public void set(String key,String value,Date date) {
 		redisTemplate.opsForValue().set(key, value);
 		redisTemplate.expireAt(key, date);
 	}
@@ -132,7 +134,7 @@ public class RedisService {
 	 * @param l
 	 * @return
 	 */
-	public void set(String key,Object value,long l) {
+	public void set(String key,String value,long l) {
 		redisTemplate.opsForValue().set(key, value);
 		redisTemplate.expire(key,l,TimeUnit.MILLISECONDS);
 	}
@@ -176,7 +178,7 @@ public class RedisService {
 	 * @param timeout 过期时间
 	 * @param unit 时间类型
 	 */
-	public void set(String key,Object value,long timeout,TimeUnit unit) {
+	public void set(String key,String value,long timeout,TimeUnit unit) {
 		redisTemplate.opsForValue().set(key, value,timeout,unit);
 	}
 
@@ -185,7 +187,7 @@ public class RedisService {
 	 * @param key
 	 * @return
 	 */
-	public Object get(String key) {
+	public String get(String key) {
 		return redisTemplate.opsForValue().get(key);
 	}
 	/**
@@ -232,10 +234,21 @@ public class RedisService {
 	 */
 	public Boolean hSet(String key,String field,String value){
 
-		RedisConnection con=redisTemplate.getConnectionFactory().getConnection();
-		Boolean b=con.hSet(key.getBytes(),field.getBytes(),value.getBytes());
-		con.close();
+		RedisConnection con=null;
+		Boolean b=null;
+		try{
+			con=redisTemplate.getConnectionFactory().getConnection();
+			b=con.hSet(key.getBytes(),field.getBytes(),value.getBytes());
+		}catch (Exception e){
+			logger.info("--------redis hset异常-----key:"+key+"----field:"+field+"------value:"+value,e);
+			b=false;
+		}finally {
+			if(con!=null){
+				con.close();
+			}
+		}
 		return b;
+
 	}
 
 	/**

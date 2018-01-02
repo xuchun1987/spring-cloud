@@ -1,7 +1,9 @@
 package cloud.controller;
 
 
+import cloud.redis.RedisService;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +14,9 @@ import java.util.*;
 @RequestMapping("/users")
 public class UsersController {
     private final Logger logger = Logger.getLogger(getClass());
+
+    @Autowired
+    private RedisService redisService;
 
     @PostMapping("/list")
     public List<Map<String,String>> usersList(){
@@ -26,5 +31,10 @@ public class UsersController {
         list.add(map);
         list.add(map2);
         return list;
+    }
+
+    @PostMapping("/redis")
+    public String redisTest(String key){
+       return redisService.get(key);
     }
 }
