@@ -8,16 +8,16 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 @SpringBootApplication
 @EnableEurekaServer
-public class EurekaRun extends SpringBootServletInitializer {
+public class EurekaRunB extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(EurekaRun.class);
+		return application.sources(EurekaRunB.class);
 	}
 
 	 public static void main(String[] args) {
 
-	        SpringApplication.run(EurekaRun.class, args);
+	        SpringApplication.run(EurekaRunB.class, args);
 	    }
 
 }
